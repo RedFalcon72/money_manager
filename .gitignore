@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+
+# データ
+data/raw/*.csv
+data/processed/*.db
+
+# ログ
+logs/*.log
+
+# 環境変数
+.env
+.env.*
+
+# エディタ
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# テスト・カバレッジ
+.pytest_cache/
+htmlcov/
+.coverage
+
+# ビルド
+dist/
+build/
+*.egg-info/
+
+# 出力ファイル
+outputs/*
+!outputs/.gitkeep
