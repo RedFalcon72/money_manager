@@ -1,6 +1,6 @@
 import sqlite3
 from pathlib import Path
-from models import Transaction
+from tracker.models import Transaction
 
 DB_PATH = Path("data/processed/money.db")
 
