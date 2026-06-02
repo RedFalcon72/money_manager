@@ -63,7 +63,7 @@ def load_csv(filepath: Path) -> list[Transaction]:
             t = Transaction(
                 date=pd.to_datetime(row[mapping["date"]]).date(),
                 amount=amount,
-                description=str(row[mapping["description"]]),
+                description=str(row[mapping["description"]]).strip(),
                 source=filepath.name,
             )
             transactions.append(t)
@@ -73,3 +73,7 @@ def load_csv(filepath: Path) -> list[Transaction]:
 
     logger.info(f"{len(transactions)}件読み込み完了: {filepath.name}")
     return transactions
+
+
+
+

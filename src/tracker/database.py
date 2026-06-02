@@ -12,13 +12,13 @@ def init_db() -> None:
     with get_connection() as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS transactions (
-                id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                date        TEXT NOT NULL,
-                amount      INTEGER NOT NULL,
-                description TEXT NOT NULL,
-                source      TEXT NOT NULL,
-                category    TEXT NOT NULL DEFAULT '未分類',
-                UNIQUE(date, amount, description, source)
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,   
+                date        TEXT NOT NULL,                         -- "YYYY-MM-DD"形式で保存
+                amount      INTEGER NOT NULL,                      -- 収入(+)、支出(-)
+                description TEXT NOT NULL,                         -- 摘要・店名
+                source      TEXT NOT NULL,                         -- どのCSVから来たか
+                category    TEXT NOT NULL DEFAULT '未分類',         -- カテゴリ（後で分析して付ける）
+                UNIQUE(date, amount, description, source)          -- 重複防止
             )
         """)
 
