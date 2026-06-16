@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 from tracker.analyzer import load_csv
-from tracker.database import init_db, save_transactions
+from tracker.database import init_db, save_transactions, get_category_mapping
 from tracker.logger import get_logger
 
 
@@ -19,7 +19,8 @@ def main():
         sys.exit(1)
 
     init_db()
-    transactions = load_csv(filepath)
+    category_mapping = get_category_mapping()
+    transactions = load_csv(filepath, category_mapping)
     saved = save_transactions(transactions)
     print(f"{saved}件保存しました（スキップ: {len(transactions) - saved}件）")
 

@@ -2,7 +2,8 @@ import sqlite3
 from pathlib import Path
 from tracker.models import Transaction
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2] # プロジェクトのルートディレクトリを取得
+# プロジェクトのルートディレクトリを取得
+PROJECT_ROOT = Path(__file__).resolve().parents[2] 
 DB_PATH = PROJECT_ROOT / "data" / "processed" / "money.db"
 
 def get_connection() -> sqlite3.Connection:
