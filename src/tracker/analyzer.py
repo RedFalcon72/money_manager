@@ -28,7 +28,7 @@ def detect_columns(df: pd.DataFrame) -> dict[str, str]:
 
     return mapping
 
-def load_csv(filepath: Path) -> list[Transaction]:
+def load_csv(filepath: Path, category_mapping: dict[str, str] | None = None) -> list[Transaction]:
     """CSVを読み込んでTransactionのリストを返す"""
     logger.info(f"読み込み開始: {filepath.name}")
 
@@ -60,16 +60,25 @@ def load_csv(filepath: Path) -> list[Transaction]:
 
             amount = income - expense
 
+            description = str(row[mapping["description"]]).strip()
+            category = category_mapping.get(description, "未分類") if category_mapping else "未分類"
+
             t = Transaction(
                 date=pd.to_datetime(row[mapping["date"]]).date(),
                 amount=amount,
-                description=str(row[mapping["description"]]).strip(),
+                description=description,
                 source=filepath.name,
+                category=category,
             )
+
             transactions.append(t)
         except Exception as e:
             logger.warning(f"行スキップ: {e}")
             continue
+
+        
+
+    
 
     logger.info(f"{len(transactions)}件読み込み完了: {filepath.name}")
     return transactions
