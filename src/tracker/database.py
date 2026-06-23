@@ -61,3 +61,36 @@ def get_category_mapping() -> dict[str, str]:
             "SELECT DISTINCT description, category FROM transactions WHERE category != '未分類'"
         )
         return {row[0]: row[1] for row in cursor.fetchall()}
+    
+def get_summary(start_date: str, end_date: str) -> dict:
+    """指定した日付範囲(YYYY-MM-DD)の収支サマリーを返す"""
+    with get_connection() as conn:
+        cursor = conn.execute("""
+            SELECT 
+                SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END) as income,
+                SUM(CASE WHEN amount < 0 THEN amount ELSE 0 END) as expense
+            FROM transactions
+            WHERE date >= ? AND date <= ?
+        """, (start_date, end_date))
+        row = cursor.fetchone()
+        income = row[0] or 0
+        expense = row[1] or 0
+        return {
+            "start_date": start_date,
+            "end_date": end_date,
+            "income": income,
+            "expense": expense,
+            "balance": income + expense,
+        }
+
+def get_category_summary(start_date: str, end_date: str) -> list[dict]:
+    """指定した日付範囲のカテゴリ別支出を返す"""
+    with get_connection() as conn:
+        cursor = conn.execute("""
+            SELECT category, SUM(amount) as total
+            FROM transactions
+            WHERE date >= ? AND date <= ? AND amount < 0
+            GROUP BY category
+            ORDER BY total
+        """, (start_date, end_date))
+        return [{"category": r[0], "total": r[1]} for r in cursor.fetchall()]
