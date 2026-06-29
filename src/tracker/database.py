@@ -94,3 +94,24 @@ def get_category_summary(start_date: str, end_date: str) -> list[dict]:
             ORDER BY total
         """, (start_date, end_date))
         return [{"category": r[0], "total": r[1]} for r in cursor.fetchall()]
+    
+def get_transactions(start_date: str, end_date: str) -> list[dict]:
+    """指定した日付範囲の取引一覧を返す"""
+    with get_connection() as conn:
+        cursor = conn.execute("""
+            SELECT id, date, amount, description, source, category
+            FROM transactions
+            WHERE date >= ? AND date <= ?
+            ORDER BY date
+        """, (start_date, end_date))
+        return [
+            {
+                "id": r[0],
+                "date": r[1],
+                "amount": r[2],
+                "description": r[3],
+                "source": r[4],
+                "category": r[5],
+            }
+            for r in cursor.fetchall()
+        ]

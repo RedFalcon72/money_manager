@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-from tracker.analyzer import load_csv
+from tracker.loader import load_csv
 from tracker.database import init_db, save_transactions, get_category_mapping
 from tracker.logger import get_logger
 
