@@ -4,7 +4,7 @@ A backend tool that imports household budget CSVs into SQLite and provides incom
 
 ## Features
 
-- Import CSVs from various banks/cards (automatic column detection, multi-encoding support)
+- Import CSVs from various banks/cards via API (automatic column detection, multi-encoding support)
 - Save to SQLite with duplicate prevention
 - Manual category classification, automatically applied to future imports
 - Get income/expense summary for a given date range
@@ -21,14 +21,16 @@ A backend tool that imports household budget CSVs into SQLite and provides incom
 
 ## Project Structure
 
+```
 src/tracker/
-├── models.py # Transaction dataclass
-├── loader.py # CSV reading and column auto-detection
-├── database.py # SQLite read/write and aggregation
-├── logger.py # Logging
+├── models.py       # Transaction dataclass
+├── loader.py       # CSV reading and column auto-detection
+├── database.py     # SQLite read/write and aggregation
+├── logger.py       # Logging
 ├── api/
-│ └── main.py # FastAPI endpoints
-└── main.py # CLI entry point
+│   └── main.py     # FastAPI endpoints
+└── __main__.py     # API server entry point
+```
 
 ## Setup
 
@@ -40,30 +42,26 @@ pip install -e .
 
 ## Usage
 
-### Import a CSV
-
-```bash
-python -m tracker import data/raw/your_file.csv
-```
-
 ### Start the API server
 
 ```bash
-uvicorn tracker.api.main:app --reload
+python -m tracker
 ```
 
 API docs available at `http://127.0.0.1:8000/docs`.
 
 ### API Endpoints
 
-| Method | Path              | Description                             |
-| ------ | ----------------- | --------------------------------------- |
-| GET    | /summary          | Income/expense summary for a date range |
-| GET    | /summary/category | Category breakdown for a date range     |
-| GET    | /transactions     | Transaction list for a date range       |
+| Method | Path                        | Description                              |
+| ------ | --------------------------- | ---------------------------------------- |
+| GET    | /summary                    | Income/expense summary for a date range  |
+| GET    | /summary/category           | Category breakdown for a date range      |
+| GET    | /transactions               | Transaction list for a date range        |
+| POST   | /import                     | Upload a CSV file to import transactions |
+| PUT    | /transactions/{id}/category | Update category for a transaction        |
 
-Query parameters: `start_date`, `end_date` (format: `YYYY-MM-DD`)
+Query parameters for GET endpoints: `start_date`, `end_date` (format: `YYYY-MM-DD`)
 
 ## License
 
-MIT License
+All Rights Reserved. See LICENSE for details.
