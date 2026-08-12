@@ -12,8 +12,16 @@ from tracker.database import (
 )
 from tracker.loader import load_csv
 from tracker.database import save_transactions
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/summary")
 def summary(start_date: str, end_date: str):
