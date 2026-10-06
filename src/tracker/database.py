@@ -48,6 +48,12 @@ def update_category(transaction_id: int, category: str) -> None:
             return
         description = row[0]
 
+        # 指定IDの取引は現在のカテゴリに関係なく更新
+        conn.execute(
+            "UPDATE transactions SET category = ? WHERE id = ?",
+            (category, transaction_id)
+        )
+
         # 同じdescriptionの未分類を一括更新
         conn.execute(
             "UPDATE transactions SET category = ? WHERE description = ? AND category = '未分類'",
