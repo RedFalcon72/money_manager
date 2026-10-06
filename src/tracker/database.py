@@ -23,6 +23,15 @@ def init_db() -> None:
                 UNIQUE(date, amount, description, source)          -- 重複防止
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS categories (
+                name TEXT PRIMARY KEY
+            )
+        """)
+        conn.execute("""
+            INSERT OR IGNORE INTO categories (name)
+            SELECT DISTINCT category FROM transactions WHERE amount < 0
+        """)
 
 def save_transactions(transactions: list[Transaction]) -> int:
     """保存した件数を返す"""
@@ -33,6 +42,11 @@ def save_transactions(transactions: list[Transaction]) -> int:
                 "INSERT OR IGNORE INTO transactions (date, amount, description, source, category) VALUES (?, ?, ?, ?, ?)",
                 (str(t.date), t.amount, t.description, t.source, t.category)
             )
+            if t.amount < 0:
+                conn.execute(
+                    "INSERT OR IGNORE INTO categories (name) VALUES (?)",
+                    (t.category,)
+                )
             saved += cursor.rowcount
     return saved
 
@@ -41,12 +55,17 @@ def update_category(transaction_id: int, category: str) -> None:
     with get_connection() as conn:
         # 該当の取引のdescriptionを取得
         cursor = conn.execute(
-            "SELECT description FROM transactions WHERE id = ?", (transaction_id,)
+            "SELECT description, amount FROM transactions WHERE id = ?", (transaction_id,)
         )
         row = cursor.fetchone()
         if not row:
             return
         description = row[0]
+        if row[1] < 0:
+            conn.execute(
+                "INSERT OR IGNORE INTO categories (name) VALUES (?)",
+                (category,)
+            )
 
         # 指定IDの取引は現在のカテゴリに関係なく更新
         conn.execute(
@@ -93,10 +112,12 @@ def get_category_summary(start_date: str, end_date: str) -> list[dict]:
     """指定した日付範囲のカテゴリ別支出を返す"""
     with get_connection() as conn:
         cursor = conn.execute("""
-            SELECT category, SUM(amount) as total
-            FROM transactions
-            WHERE date >= ? AND date <= ? AND amount < 0
-            GROUP BY category
+            SELECT c.name, COALESCE(SUM(t.amount), 0) as total
+            FROM categories c
+            LEFT JOIN transactions t
+                ON t.category = c.name
+                AND t.date >= ? AND t.date <= ? AND t.amount < 0
+            GROUP BY c.name
             ORDER BY total
         """, (start_date, end_date))
         return [{"category": r[0], "total": r[1]} for r in cursor.fetchall()]
